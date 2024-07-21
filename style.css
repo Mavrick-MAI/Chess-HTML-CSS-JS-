@@ -1,0 +1,65 @@
+#newgame {
+    margin: 10px;
+}
+
+#chessboard {
+    display: grid;
+    grid-template-rows: repeat(8, 60px);
+    grid-template-columns: repeat(8, 60px);
+    float: left;
+}
+
+#chessboard .square {
+    height: 60px;
+    width: 60px;
+    margin: 0;
+    border: 1px solid black;
+}
+
+.square.black {
+    background-color: darkslategray;
+}
+.square.white {
+    background-color: antiquewhite;
+}
+.square.move_possible {
+    background-color: aqua;
+}
+
+.piece {
+    margin: auto;
+}
+
+.castle_rook {
+    background-color: gold !important;
+    background-image: url("img/white_rook.png");
+    opacity: 50%;
+}
+
+.castle_king {
+    background-color: gold !important;
+    background-image: url("img/white_king.png");
+    opacity: 50%;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+#white_pieces {
+    display: none;
+}
+
+#black_pieces {
+    display: none;
+}
+
+#message {
+    clear: left;
+    color: red;
+    text-align: center;
+    width: 20vw;
+    margin: 60px;
+}
