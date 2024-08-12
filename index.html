@@ -8,23 +8,61 @@
   </head>
   <body>
     <div id="newgame">
-      <button onclick="newgame()">Nouvelle partie</button>
+      <button class="button" onclick="newgame()">Nouvelle partie</button>
     </div>
+
+    <div class="checkbox-wrapper-8">
+      <input type="checkbox" id="ai" class="tgl tgl-skewed" />
+      <label
+        for="ai"
+        data-tg-on="AI ON"
+        data-tg-off="AI OFF"
+        class="tgl-btn"></label>
+    </div>
+
     <div id="chessboard"></div>
     <div id="white_pieces">
       <ul>
-        <li><img src="img/white_queen.png" onclick="promotion('queen', 'white')"></li>
-        <li><img src="img/white_bishop.png" onclick="promotion('bishop', 'white')"></li>
-        <li><img src="img/white_knight.png" onclick="promotion('knight', 'white')"></li>
-        <li><img src="img/white_rook.png" onclick="promotion('rook', 'white')"></li>
+        <li>
+          <img
+            src="img/white_queen.png"
+            onclick="promotion('queen', 'white')" />
+        </li>
+        <li>
+          <img
+            src="img/white_bishop.png"
+            onclick="promotion('bishop', 'white')" />
+        </li>
+        <li>
+          <img
+            src="img/white_knight.png"
+            onclick="promotion('knight', 'white')" />
+        </li>
+        <li>
+          <img src="img/white_rook.png" onclick="promotion('rook', 'white')" />
+        </li>
       </ul>
     </div>
     <div id="black_pieces">
       <ul>
-        <li><img src="img/black_queen.png" onclick="promotion('queen', 'black')"></li>
-        <li><img src="img/black_bishop.png" onclick="promotion('bishop', 'black')"></li>
-        <li><img src="img/black_knight.png" onclick="promotion('knight', 'black')"></li>
-        <li><img src="img/black_rook.png" onclick="promotion('rook', 'black')"></li>
+        <li>
+          <img
+            src="img/black_queen.png"
+            onclick="promotion('queen', 'black')" />
+        </li>
+        <li>
+          <img
+            src="img/black_bishop.png"
+            onclick="promotion('bishop', 'black')" />
+        </li>
+        <li>
+          <img
+            src="img/black_knight.png"
+            onclick="promotion('knight', 'black')" />
+        </li>
+        <li>
+          <img src="img/black_rook.png" onclick="promotion('rook', 'black')" />
+        </li>
       </ul>
     </div>
     <div id="message"></div>

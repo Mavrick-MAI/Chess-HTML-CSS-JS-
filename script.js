@@ -13,6 +13,8 @@ let listWhitePieceMove = [];
 let listWhiteCheckMove = [];
 let listBlackPiece = [];
 let listWhitePiece = [];
+let whiteKingMate = false;
+let blackKingMate = false;
 let isWhiteKingCheck = false;
 let isBlackKingCheck = false;
 let checkingKingPiece;
@@ -24,7 +26,6 @@ let promotingPawn;
 let listPromotionPieces;
 
 function newgame() {
-
   chessboard = document.getElementById("chessboard");
   chessboard.textContent = "";
   message = document.getElementById("message");
@@ -33,7 +34,7 @@ function newgame() {
   listPromotionPieces.style.display = "none";
   listPromotionPieces = document.getElementById("black_pieces");
   listPromotionPieces.style.display = "none";
-  
+
   colorTurn = "white";
   squares = [];
   idSquare = 0;
@@ -54,11 +55,11 @@ function newgame() {
   castle = false;
   lastPawnMove;
   promotingPawn;
-  
+
   for (i = 0; i < 8; i++) {
     // * Création d'une ligne de l'échiquier
     let squareRow = [];
-  
+
     for (j = 0; j < 8; j++) {
       // * Création d'un carré de l'échiquier
       let newSquare = document.createElement("div");
@@ -66,28 +67,28 @@ function newgame() {
       newSquare.dataset.x = j;
       newSquare.dataset.y = i;
       newSquare.dataset.clickevent = true;
-  
+
       // * Détermination de la couleur du carré courant
       if ((j + i + 1) % 2 == 0) {
         newSquare.classList.add("black");
       } else {
         newSquare.classList.add("white");
       }
-  
+
       // * Création de l'évènement de click du carré courant
       newSquare.addEventListener("click", onClickSquareHandler);
-  
+
       // * Création des pièces à leur position de départ
       if ([0, 1, 6, 7].includes(i)) {
         createPieces(newSquare);
       }
-  
+
       // * Ajout du carré courant à la ligne courante
       squareRow[j] = newSquare;
       // * Ajout du carré à l'échiquier
       chessboard.appendChild(newSquare);
     }
-  
+
     // * Ajout de la ligne courante à la liste de carrés
     squares[i] = squareRow;
   }
@@ -215,13 +216,13 @@ function updateListMove(listSquare, color) {
           !squares[yPiece - 1][xPiece].firstChild
         ) {
           listPossibleMove.push(squares[yPiece - 1][xPiece]);
-        }
-        if (
-          checkEdge(xPiece, yPiece - 2) &&
-          isStarting &&
-          !squares[yPiece - 2][xPiece].firstChild
-        ) {
-          listPossibleMove.push(squares[yPiece - 2][xPiece]);
+          if (
+            checkEdge(xPiece, yPiece - 2) &&
+            isStarting &&
+            !squares[yPiece - 2][xPiece].firstChild
+          ) {
+            listPossibleMove.push(squares[yPiece - 2][xPiece]);
+          }
         }
         if (checkEdge(xPiece - 1, yPiece - 1)) {
           potentialPiece = squares[yPiece - 1][xPiece - 1].firstChild;
@@ -240,9 +241,16 @@ function updateListMove(listSquare, color) {
         if (yPiece == 3) {
           if (checkEdge(xPiece - 1, yPiece)) {
             potentialPiece = squares[yPiece][xPiece - 1].firstChild;
-            if (potentialPiece && potentialPiece.dataset.piece.includes("black_pawn")) {
+            if (
+              potentialPiece &&
+              potentialPiece.dataset.piece.includes("black_pawn")
+            ) {
               if (lastPawnMove.dataset) {
-                if (parseInt(potentialPiece.parentElement.dataset.y) - parseInt(lastPawnMove.dataset.y) == 2) {
+                if (
+                  parseInt(potentialPiece.parentElement.dataset.y) -
+                    parseInt(lastPawnMove.dataset.y) ==
+                  2
+                ) {
                   listPossibleMove.push(squares[yPiece - 1][xPiece - 1]);
                   squares[yPiece - 1][xPiece - 1].dataset.enpassant = true;
                 }
@@ -251,9 +259,16 @@ function updateListMove(listSquare, color) {
           }
           if (checkEdge(xPiece + 1, yPiece)) {
             potentialPiece = squares[yPiece][xPiece + 1].firstChild;
-            if (potentialPiece && potentialPiece.dataset.piece.includes("black_pawn")) {
+            if (
+              potentialPiece &&
+              potentialPiece.dataset.piece.includes("black_pawn")
+            ) {
               if (lastPawnMove.dataset) {
-                if (parseInt(potentialPiece.parentElement.dataset.y) - parseInt(lastPawnMove.dataset.y) == 2) {
+                if (
+                  parseInt(potentialPiece.parentElement.dataset.y) -
+                    parseInt(lastPawnMove.dataset.y) ==
+                  2
+                ) {
                   listPossibleMove.push(squares[yPiece - 1][xPiece + 1]);
                   squares[yPiece - 1][xPiece + 1].dataset.enpassant = true;
                 }
@@ -267,13 +282,13 @@ function updateListMove(listSquare, color) {
           !squares[yPiece + 1][xPiece].firstChild
         ) {
           listPossibleMove.push(squares[yPiece + 1][xPiece]);
-        }
-        if (
-          checkEdge(xPiece, yPiece + 2) &&
-          isStarting &&
-          !squares[yPiece + 2][xPiece].firstChild
-        ) {
-          listPossibleMove.push(squares[yPiece + 2][xPiece]);
+          if (
+            checkEdge(xPiece, yPiece + 2) &&
+            isStarting &&
+            !squares[yPiece + 2][xPiece].firstChild
+          ) {
+            listPossibleMove.push(squares[yPiece + 2][xPiece]);
+          }
         }
         if (checkEdge(xPiece - 1, yPiece + 1)) {
           potentialPiece = squares[yPiece + 1][xPiece - 1].firstChild;
@@ -292,9 +307,16 @@ function updateListMove(listSquare, color) {
         if (yPiece == 4) {
           if (checkEdge(xPiece - 1, yPiece)) {
             potentialPiece = squares[yPiece][xPiece - 1].firstChild;
-            if (potentialPiece && potentialPiece.dataset.piece.includes("white_pawn")) {
+            if (
+              potentialPiece &&
+              potentialPiece.dataset.piece.includes("white_pawn")
+            ) {
               if (lastPawnMove.dataset) {
-                if (parseInt(lastPawnMove.dataset.y) - parseInt(potentialPiece.parentElement.dataset.y) == 2) {
+                if (
+                  parseInt(lastPawnMove.dataset.y) -
+                    parseInt(potentialPiece.parentElement.dataset.y) ==
+                  2
+                ) {
                   listPossibleMove.push(squares[yPiece + 1][xPiece - 1]);
                   squares[yPiece + 1][xPiece - 1].dataset.enpassant = true;
                 }
@@ -303,9 +325,16 @@ function updateListMove(listSquare, color) {
           }
           if (checkEdge(xPiece + 1, yPiece)) {
             potentialPiece = squares[yPiece][xPiece + 1].firstChild;
-            if (potentialPiece && potentialPiece.dataset.piece.includes("white_pawn")) {
+            if (
+              potentialPiece &&
+              potentialPiece.dataset.piece.includes("white_pawn")
+            ) {
               if (lastPawnMove.dataset) {
-                if (parseInt(lastPawnMove.dataset.y) - parseInt(potentialPiece.parentElement.dataset.y) == 2) {
+                if (
+                  parseInt(lastPawnMove.dataset.y) -
+                    parseInt(potentialPiece.parentElement.dataset.y) ==
+                  2
+                ) {
                   listPossibleMove.push(squares[yPiece + 1][xPiece + 1]);
                   squares[yPiece + 1][xPiece + 1].dataset.enpassant = true;
                 }
@@ -315,12 +344,16 @@ function updateListMove(listSquare, color) {
         }
       } else if (squarePiece.includes("rook")) {
         let topFound = false;
+        let top2Found = false;
         let topPiece;
         let bottomFound = false;
+        let bottom2Found = false;
         let bottomPiece;
         let leftFound = false;
+        let left2Found = false;
         let leftPiece;
         let rightFound = false;
+        let right2Found = false;
         let rightPiece;
 
         for (i = 1; i < 8; i++) {
@@ -347,14 +380,15 @@ function updateListMove(listSquare, color) {
                       }
                     }
                   } else {
-                    if (
-                      potentialPiece &&
-                      potentialPiece.dataset.piece.includes("king")
-                    ) {
-                      if (potentialPiece.dataset.color == "white") {
-                        listWhiteBlockingPiece.push(topPiece.parentElement);
+                    if (!top2Found && potentialPiece) {
+                      if (potentialPiece.dataset.piece.includes("king")) {
+                        if (potentialPiece.dataset.color == "white") {
+                          listWhiteBlockingPiece.push(topPiece.parentElement);
+                        } else {
+                          listBlackBlockingPiece.push(topPiece.parentElement);
+                        }
                       } else {
-                        listBlackBlockingPiece.push(topPiece.parentElement);
+                        top2Found = true;
                       }
                     }
                   }
@@ -395,14 +429,19 @@ function updateListMove(listSquare, color) {
                       }
                     }
                   } else {
-                    if (
-                      potentialPiece &&
-                      potentialPiece.dataset.piece.includes("king")
-                    ) {
-                      if (potentialPiece.dataset.color == "white") {
-                        listWhiteBlockingPiece.push(bottomPiece.parentElement);
+                    if (!bottom2Found && potentialPiece) {
+                      if (potentialPiece.dataset.piece.includes("king")) {
+                        if (potentialPiece.dataset.color == "white") {
+                          listWhiteBlockingPiece.push(
+                            bottomPiece.parentElement
+                          );
+                        } else {
+                          listBlackBlockingPiece.push(
+                            bottomPiece.parentElement
+                          );
+                        }
                       } else {
-                        listBlackBlockingPiece.push(bottomPiece.parentElement);
+                        bottom2Found = true;
                       }
                     }
                   }
@@ -445,14 +484,15 @@ function updateListMove(listSquare, color) {
                       }
                     }
                   } else {
-                    if (
-                      potentialPiece &&
-                      potentialPiece.dataset.piece.includes("king")
-                    ) {
-                      if (potentialPiece.dataset.color == "white") {
-                        listWhiteBlockingPiece.push(leftPiece.parentElement);
+                    if (!left2Found && potentialPiece) {
+                      if (potentialPiece.dataset.piece.includes("king")) {
+                        if (potentialPiece.dataset.color == "white") {
+                          listWhiteBlockingPiece.push(leftPiece.parentElement);
+                        } else {
+                          listBlackBlockingPiece.push(leftPiece.parentElement);
+                        }
                       } else {
-                        listBlackBlockingPiece.push(leftPiece.parentElement);
+                        left2Found = true;
                       }
                     }
                   }
@@ -495,14 +535,15 @@ function updateListMove(listSquare, color) {
                       }
                     }
                   } else {
-                    if (
-                      potentialPiece &&
-                      potentialPiece.dataset.piece.includes("king")
-                    ) {
-                      if (potentialPiece.dataset.color == "white") {
-                        listWhiteBlockingPiece.push(rightPiece.parentElement);
+                    if (!right2Found && potentialPiece) {
+                      if (potentialPiece.dataset.piece.includes("king")) {
+                        if (potentialPiece.dataset.color == "white") {
+                          listWhiteBlockingPiece.push(rightPiece.parentElement);
+                        } else {
+                          listBlackBlockingPiece.push(rightPiece.parentElement);
+                        }
                       } else {
-                        listBlackBlockingPiece.push(rightPiece.parentElement);
+                        right2Found = true;
                       }
                     }
                   }
@@ -529,49 +570,73 @@ function updateListMove(listSquare, color) {
       } else if (squarePiece.includes("knight")) {
         if (checkEdge(xPiece - 1, yPiece - 2)) {
           potentialPiece = squares[yPiece - 2][xPiece - 1].firstChild;
-          if (!potentialPiece || (potentialPiece && potentialPiece.dataset.color != pieceColor)) {
+          if (
+            !potentialPiece ||
+            (potentialPiece && potentialPiece.dataset.color != pieceColor)
+          ) {
             listPossibleMove.push(squares[yPiece - 2][xPiece - 1]);
           }
         }
         if (checkEdge(xPiece + 1, yPiece - 2)) {
           potentialPiece = squares[yPiece - 2][xPiece + 1].firstChild;
-          if (!potentialPiece || (potentialPiece && potentialPiece.dataset.color != pieceColor)) {
+          if (
+            !potentialPiece ||
+            (potentialPiece && potentialPiece.dataset.color != pieceColor)
+          ) {
             listPossibleMove.push(squares[yPiece - 2][xPiece + 1]);
           }
         }
         if (checkEdge(xPiece + 2, yPiece - 1)) {
           potentialPiece = squares[yPiece - 1][xPiece + 2].firstChild;
-          if (!potentialPiece || (potentialPiece && potentialPiece.dataset.color != pieceColor)) {
+          if (
+            !potentialPiece ||
+            (potentialPiece && potentialPiece.dataset.color != pieceColor)
+          ) {
             listPossibleMove.push(squares[yPiece - 1][xPiece + 2]);
           }
         }
         if (checkEdge(xPiece + 2, yPiece + 1)) {
           potentialPiece = squares[yPiece + 1][xPiece + 2].firstChild;
-          if (!potentialPiece || (potentialPiece && potentialPiece.dataset.color != pieceColor)) {
+          if (
+            !potentialPiece ||
+            (potentialPiece && potentialPiece.dataset.color != pieceColor)
+          ) {
             listPossibleMove.push(squares[yPiece + 1][xPiece + 2]);
           }
         }
         if (checkEdge(xPiece + 1, yPiece + 2)) {
           potentialPiece = squares[yPiece + 2][xPiece + 1].firstChild;
-          if (!potentialPiece || (potentialPiece && potentialPiece.dataset.color != pieceColor)) {
+          if (
+            !potentialPiece ||
+            (potentialPiece && potentialPiece.dataset.color != pieceColor)
+          ) {
             listPossibleMove.push(squares[yPiece + 2][xPiece + 1]);
           }
         }
         if (checkEdge(xPiece - 1, yPiece + 2)) {
           potentialPiece = squares[yPiece + 2][xPiece - 1].firstChild;
-          if (!potentialPiece || (potentialPiece && potentialPiece.dataset.color != pieceColor)) {
+          if (
+            !potentialPiece ||
+            (potentialPiece && potentialPiece.dataset.color != pieceColor)
+          ) {
             listPossibleMove.push(squares[yPiece + 2][xPiece - 1]);
           }
         }
         if (checkEdge(xPiece - 2, yPiece + 1)) {
           potentialPiece = squares[yPiece + 1][xPiece - 2].firstChild;
-          if (!potentialPiece || (potentialPiece && potentialPiece.dataset.color != pieceColor)) {
+          if (
+            !potentialPiece ||
+            (potentialPiece && potentialPiece.dataset.color != pieceColor)
+          ) {
             listPossibleMove.push(squares[yPiece + 1][xPiece - 2]);
           }
         }
         if (checkEdge(xPiece - 2, yPiece - 1)) {
           potentialPiece = squares[yPiece - 1][xPiece - 2].firstChild;
-          if (!potentialPiece || (potentialPiece && potentialPiece.dataset.color != pieceColor)) {
+          if (
+            !potentialPiece ||
+            (potentialPiece && potentialPiece.dataset.color != pieceColor)
+          ) {
             listPossibleMove.push(squares[yPiece - 1][xPiece - 2]);
           }
         }
@@ -581,15 +646,18 @@ function updateListMove(listSquare, color) {
         } else {
           listBlackCheckMove = listBlackCheckMove.concat(listPossibleMove);
         }
-
       } else if (squarePiece.includes("bishop")) {
         let topRightFound = false;
+        let topRight2Found = false;
         let topRightPiece;
         let topLeftFound = false;
+        let topLeft2Found = false;
         let topLeftPiece;
         let bottomRightFound = false;
+        let bottomRight2Found = false;
         let bottomRightPiece;
         let bottomLeftFound = false;
+        let bottomLeft2Found = false;
         let bottomLeftPiece;
 
         for (i = 1; i < 8; i++) {
@@ -612,20 +680,29 @@ function updateListMove(listSquare, color) {
                       potentialPiece.dataset.color == pieceColor
                     ) {
                       if (pieceColor == "white") {
-                        listWhiteCheckMove.push(squares[yPiece - i][xPiece + i]);
+                        listWhiteCheckMove.push(
+                          squares[yPiece - i][xPiece + i]
+                        );
                       } else {
-                        listBlackCheckMove.push(squares[yPiece - i][xPiece + i]);
+                        listBlackCheckMove.push(
+                          squares[yPiece - i][xPiece + i]
+                        );
                       }
                     }
                   } else {
-                    if (
-                      potentialPiece &&
-                      potentialPiece.dataset.piece.includes("king")
-                    ) {
-                      if (potentialPiece.dataset.color == "white") {
-                        listWhiteBlockingPiece.push(topRightPiece.parentElement);
+                    if (!topRight2Found && potentialPiece) {
+                      if (potentialPiece.dataset.piece.includes("king")) {
+                        if (potentialPiece.dataset.color == "white") {
+                          listWhiteBlockingPiece.push(
+                            topRightPiece.parentElement
+                          );
+                        } else {
+                          listBlackBlockingPiece.push(
+                            topRightPiece.parentElement
+                          );
+                        }
                       } else {
-                        listBlackBlockingPiece.push(topRightPiece.parentElement);
+                        topRight2Found = true;
                       }
                     }
                   }
@@ -662,20 +739,29 @@ function updateListMove(listSquare, color) {
                       potentialPiece.dataset.color == pieceColor
                     ) {
                       if (pieceColor == "white") {
-                        listWhiteCheckMove.push(squares[yPiece - i][xPiece - i]);
+                        listWhiteCheckMove.push(
+                          squares[yPiece - i][xPiece - i]
+                        );
                       } else {
-                        listBlackCheckMove.push(squares[yPiece - i][xPiece - i]);
+                        listBlackCheckMove.push(
+                          squares[yPiece - i][xPiece - i]
+                        );
                       }
                     }
                   } else {
-                    if (
-                      potentialPiece &&
-                      potentialPiece.dataset.piece.includes("king")
-                    ) {
-                      if (potentialPiece.dataset.color == "white") {
-                        listWhiteBlockingPiece.push(topLeftPiece.parentElement);
+                    if (!topLeft2Found && potentialPiece) {
+                      if (potentialPiece.dataset.piece.includes("king")) {
+                        if (potentialPiece.dataset.color == "white") {
+                          listWhiteBlockingPiece.push(
+                            topLeftPiece.parentElement
+                          );
+                        } else {
+                          listBlackBlockingPiece.push(
+                            topLeftPiece.parentElement
+                          );
+                        }
                       } else {
-                        listBlackBlockingPiece.push(topLeftPiece.parentElement);
+                        topLeft2Found = true;
                       }
                     }
                   }
@@ -712,20 +798,29 @@ function updateListMove(listSquare, color) {
                       potentialPiece.dataset.color == pieceColor
                     ) {
                       if (pieceColor == "white") {
-                        listWhiteCheckMove.push(squares[yPiece + i][xPiece + i]);
+                        listWhiteCheckMove.push(
+                          squares[yPiece + i][xPiece + i]
+                        );
                       } else {
-                        listBlackCheckMove.push(squares[yPiece + i][xPiece + i]);
+                        listBlackCheckMove.push(
+                          squares[yPiece + i][xPiece + i]
+                        );
                       }
                     }
                   } else {
-                    if (
-                      potentialPiece &&
-                      potentialPiece.dataset.piece.includes("king")
-                    ) {
-                      if (potentialPiece.dataset.color == "white") {
-                        listWhiteBlockingPiece.push(bottomRightPiece.parentElement);
+                    if (!bottomRight2Found && potentialPiece) {
+                      if (potentialPiece.dataset.piece.includes("king")) {
+                        if (potentialPiece.dataset.color == "white") {
+                          listWhiteBlockingPiece.push(
+                            bottomRightPiece.parentElement
+                          );
+                        } else {
+                          listBlackBlockingPiece.push(
+                            bottomRightPiece.parentElement
+                          );
+                        }
                       } else {
-                        listBlackBlockingPiece.push(bottomRightPiece.parentElement);
+                        bottomRight2Found = true;
                       }
                     }
                   }
@@ -762,20 +857,29 @@ function updateListMove(listSquare, color) {
                       potentialPiece.dataset.color == pieceColor
                     ) {
                       if (pieceColor == "white") {
-                        listWhiteCheckMove.push(squares[yPiece + i][xPiece - i]);
+                        listWhiteCheckMove.push(
+                          squares[yPiece + i][xPiece - i]
+                        );
                       } else {
-                        listBlackCheckMove.push(squares[yPiece + i][xPiece - i]);
+                        listBlackCheckMove.push(
+                          squares[yPiece + i][xPiece - i]
+                        );
                       }
                     }
                   } else {
-                    if (
-                      potentialPiece &&
-                      potentialPiece.dataset.piece.includes("king")
-                    ) {
-                      if (potentialPiece.dataset.color == "white") {
-                        listWhiteBlockingPiece.push(bottomLeftPiece.parentElement);
+                    if (!bottomLeft2Found && potentialPiece) {
+                      if (potentialPiece.dataset.piece.includes("king")) {
+                        if (potentialPiece.dataset.color == "white") {
+                          listWhiteBlockingPiece.push(
+                            bottomLeftPiece.parentElement
+                          );
+                        } else {
+                          listBlackBlockingPiece.push(
+                            bottomLeftPiece.parentElement
+                          );
+                        }
                       } else {
-                        listBlackBlockingPiece.push(bottomLeftPiece.parentElement);
+                        bottomLeft2Found = true;
                       }
                     }
                   }
@@ -801,20 +905,28 @@ function updateListMove(listSquare, color) {
         }
       } else if (squarePiece.includes("queen")) {
         let topFound = false;
+        let top2Found = false;
         let topPiece;
         let bottomFound = false;
+        let bottom2Found = false;
         let bottomPiece;
         let leftFound = false;
+        let left2Found = false;
         let leftPiece;
         let rightFound = false;
+        let right2Found = false;
         let rightPiece;
         let topRightFound = false;
+        let topRight2Found = false;
         let topRightPiece;
         let topLeftFound = false;
+        let topLeft2Found = false;
         let topLeftPiece;
         let bottomRightFound = false;
+        let bottomRight2Found = false;
         let bottomRightPiece;
         let bottomLeftFound = false;
+        let bottomLeft2Found = false;
         let bottomLeftPiece;
 
         for (i = 1; i < 8; i++) {
@@ -841,14 +953,15 @@ function updateListMove(listSquare, color) {
                       }
                     }
                   } else {
-                    if (
-                      potentialPiece &&
-                      potentialPiece.dataset.piece.includes("king")
-                    ) {
-                      if (potentialPiece.dataset.color == "white") {
-                        listWhiteBlockingPiece.push(topPiece.parentElement);
+                    if (!top2Found && potentialPiece) {
+                      if (potentialPiece.dataset.piece.includes("king")) {
+                        if (potentialPiece.dataset.color == "white") {
+                          listWhiteBlockingPiece.push(topPiece.parentElement);
+                        } else {
+                          listBlackBlockingPiece.push(topPiece.parentElement);
+                        }
                       } else {
-                        listBlackBlockingPiece.push(topPiece.parentElement);
+                        top2Found = true;
                       }
                     }
                   }
@@ -889,14 +1002,19 @@ function updateListMove(listSquare, color) {
                       }
                     }
                   } else {
-                    if (
-                      potentialPiece &&
-                      potentialPiece.dataset.piece.includes("king")
-                    ) {
-                      if (potentialPiece.dataset.color == "white") {
-                        listWhiteBlockingPiece.push(bottomPiece.parentElement);
+                    if (!bottom2Found && potentialPiece) {
+                      if (potentialPiece.dataset.piece.includes("king")) {
+                        if (potentialPiece.dataset.color == "white") {
+                          listWhiteBlockingPiece.push(
+                            bottomPiece.parentElement
+                          );
+                        } else {
+                          listBlackBlockingPiece.push(
+                            bottomPiece.parentElement
+                          );
+                        }
                       } else {
-                        listBlackBlockingPiece.push(bottomPiece.parentElement);
+                        bottom2Found = true;
                       }
                     }
                   }
@@ -939,14 +1057,15 @@ function updateListMove(listSquare, color) {
                       }
                     }
                   } else {
-                    if (
-                      potentialPiece &&
-                      potentialPiece.dataset.piece.includes("king")
-                    ) {
-                      if (potentialPiece.dataset.color == "white") {
-                        listWhiteBlockingPiece.push(leftPiece.parentElement);
+                    if (!left2Found && potentialPiece) {
+                      if (potentialPiece.dataset.piece.includes("king")) {
+                        if (potentialPiece.dataset.color == "white") {
+                          listWhiteBlockingPiece.push(leftPiece.parentElement);
+                        } else {
+                          listBlackBlockingPiece.push(leftPiece.parentElement);
+                        }
                       } else {
-                        listBlackBlockingPiece.push(leftPiece.parentElement);
+                        left2Found = true;
                       }
                     }
                   }
@@ -989,14 +1108,15 @@ function updateListMove(listSquare, color) {
                       }
                     }
                   } else {
-                    if (
-                      potentialPiece &&
-                      potentialPiece.dataset.piece.includes("king")
-                    ) {
-                      if (potentialPiece.dataset.color == "white") {
-                        listWhiteBlockingPiece.push(rightPiece.parentElement);
+                    if (!right2Found && potentialPiece) {
+                      if (potentialPiece.dataset.piece.includes("king")) {
+                        if (potentialPiece.dataset.color == "white") {
+                          listWhiteBlockingPiece.push(rightPiece.parentElement);
+                        } else {
+                          listBlackBlockingPiece.push(rightPiece.parentElement);
+                        }
                       } else {
-                        listBlackBlockingPiece.push(rightPiece.parentElement);
+                        right2Found = true;
                       }
                     }
                   }
@@ -1033,20 +1153,29 @@ function updateListMove(listSquare, color) {
                       potentialPiece.dataset.color == pieceColor
                     ) {
                       if (pieceColor == "white") {
-                        listWhiteCheckMove.push(squares[yPiece - i][xPiece + i]);
+                        listWhiteCheckMove.push(
+                          squares[yPiece - i][xPiece + i]
+                        );
                       } else {
-                        listBlackCheckMove.push(squares[yPiece - i][xPiece + i]);
+                        listBlackCheckMove.push(
+                          squares[yPiece - i][xPiece + i]
+                        );
                       }
                     }
                   } else {
-                    if (
-                      potentialPiece &&
-                      potentialPiece.dataset.piece.includes("king")
-                    ) {
-                      if (potentialPiece.dataset.color == "white") {
-                        listWhiteBlockingPiece.push(topRightPiece.parentElement);
+                    if (!topRight2Found && potentialPiece) {
+                      if (potentialPiece.dataset.piece.includes("king")) {
+                        if (potentialPiece.dataset.color == "white") {
+                          listWhiteBlockingPiece.push(
+                            topRightPiece.parentElement
+                          );
+                        } else {
+                          listBlackBlockingPiece.push(
+                            topRightPiece.parentElement
+                          );
+                        }
                       } else {
-                        listBlackBlockingPiece.push(topRightPiece.parentElement);
+                        topRight2Found = true;
                       }
                     }
                   }
@@ -1083,20 +1212,29 @@ function updateListMove(listSquare, color) {
                       potentialPiece.dataset.color == pieceColor
                     ) {
                       if (pieceColor == "white") {
-                        listWhiteCheckMove.push(squares[yPiece - i][xPiece - i]);
+                        listWhiteCheckMove.push(
+                          squares[yPiece - i][xPiece - i]
+                        );
                       } else {
-                        listBlackCheckMove.push(squares[yPiece - i][xPiece - i]);
+                        listBlackCheckMove.push(
+                          squares[yPiece - i][xPiece - i]
+                        );
                       }
                     }
                   } else {
-                    if (
-                      potentialPiece &&
-                      potentialPiece.dataset.piece.includes("king")
-                    ) {
-                      if (potentialPiece.dataset.color == "white") {
-                        listWhiteBlockingPiece.push(topLeftPiece.parentElement);
+                    if (!topLeft2Found && potentialPiece) {
+                      if (potentialPiece.dataset.piece.includes("king")) {
+                        if (potentialPiece.dataset.color == "white") {
+                          listWhiteBlockingPiece.push(
+                            topLeftPiece.parentElement
+                          );
+                        } else {
+                          listBlackBlockingPiece.push(
+                            topLeftPiece.parentElement
+                          );
+                        }
                       } else {
-                        listBlackBlockingPiece.push(topLeftPiece.parentElement);
+                        topLeft2Found = true;
                       }
                     }
                   }
@@ -1133,20 +1271,29 @@ function updateListMove(listSquare, color) {
                       potentialPiece.dataset.color == pieceColor
                     ) {
                       if (pieceColor == "white") {
-                        listWhiteCheckMove.push(squares[yPiece + i][xPiece + i]);
+                        listWhiteCheckMove.push(
+                          squares[yPiece + i][xPiece + i]
+                        );
                       } else {
-                        listBlackCheckMove.push(squares[yPiece + i][xPiece + i]);
+                        listBlackCheckMove.push(
+                          squares[yPiece + i][xPiece + i]
+                        );
                       }
                     }
                   } else {
-                    if (
-                      potentialPiece &&
-                      potentialPiece.dataset.piece.includes("king")
-                    ) {
-                      if (potentialPiece.dataset.color == "white") {
-                        listWhiteBlockingPiece.push(bottomRightPiece.parentElement);
+                    if (!bottomRight2Found && potentialPiece) {
+                      if (potentialPiece.dataset.piece.includes("king")) {
+                        if (potentialPiece.dataset.color == "white") {
+                          listWhiteBlockingPiece.push(
+                            bottomRightPiece.parentElement
+                          );
+                        } else {
+                          listBlackBlockingPiece.push(
+                            bottomRightPiece.parentElement
+                          );
+                        }
                       } else {
-                        listBlackBlockingPiece.push(bottomRightPiece.parentElement);
+                        bottomRight2Found = true;
                       }
                     }
                   }
@@ -1183,20 +1330,29 @@ function updateListMove(listSquare, color) {
                       potentialPiece.dataset.color == pieceColor
                     ) {
                       if (pieceColor == "white") {
-                        listWhiteCheckMove.push(squares[yPiece + i][xPiece - i]);
+                        listWhiteCheckMove.push(
+                          squares[yPiece + i][xPiece - i]
+                        );
                       } else {
-                        listBlackCheckMove.push(squares[yPiece + i][xPiece - i]);
+                        listBlackCheckMove.push(
+                          squares[yPiece + i][xPiece - i]
+                        );
                       }
                     }
                   } else {
-                    if (
-                      potentialPiece &&
-                      potentialPiece.dataset.piece.includes("king")
-                    ) {
-                      if (potentialPiece.dataset.color == "white") {
-                        listWhiteBlockingPiece.push(bottomLeftPiece.parentElement);
+                    if (!bottomLeft2Found && potentialPiece) {
+                      if (potentialPiece.dataset.piece.includes("king")) {
+                        if (potentialPiece.dataset.color == "white") {
+                          listWhiteBlockingPiece.push(
+                            bottomLeftPiece.parentElement
+                          );
+                        } else {
+                          listBlackBlockingPiece.push(
+                            bottomLeftPiece.parentElement
+                          );
+                        }
                       } else {
-                        listBlackBlockingPiece.push(bottomLeftPiece.parentElement);
+                        bottomLeft2Found = true;
                       }
                     }
                   }
@@ -1407,7 +1563,8 @@ function setMoveAvailableSquare(selectedSquare) {
         }
       } else {
         if (isKingCheck) {
-          let checkingKingPieceName = checkingKingPiece.firstChild.dataset.piece;
+          let checkingKingPieceName =
+            checkingKingPiece.firstChild.dataset.piece;
           if (
             (checkingKingPieceName.includes("pawn") ||
               checkingKingPieceName.includes("knight")) &&
@@ -1464,7 +1621,6 @@ function setMoveAvailableSquare(selectedSquare) {
       curSquare.classList.add("move_possible");
     }
   }
-  
 }
 
 /**
@@ -1487,16 +1643,23 @@ function movePiece(targetedSquare) {
       listWhitePiece[targetedSquare.firstChild.dataset.id] = "";
     }
     targetedSquare.removeChild(targetedSquare.firstChild);
-  } else if (targetedSquare.dataset.enpassant && piece.dataset.piece.includes("pawn")) {
+  } else if (
+    targetedSquare.dataset.enpassant &&
+    piece.dataset.piece.includes("pawn")
+  ) {
     let enPassantX = parseInt(targetedSquare.dataset.x);
     let enPassantY = parseInt(targetedSquare.dataset.y);
     let enemyPawnSquare;
     if (piece.dataset.color == "white") {
-      listBlackPiece[squares[enPassantY + 1][enPassantX].firstChild.dataset.id] = "";
+      listBlackPiece[
+        squares[enPassantY + 1][enPassantX].firstChild.dataset.id
+      ] = "";
       enemyPawnSquare = squares[enPassantY + 1][enPassantX];
     } else {
-      listWhitePiece[squares[enPassantY - 1][enPassantX].firstChild.dataset.id] = "";
-      enemyPawnSquare = squares[enPassantY - 1][enPassantX];      
+      listWhitePiece[
+        squares[enPassantY - 1][enPassantX].firstChild.dataset.id
+      ] = "";
+      enemyPawnSquare = squares[enPassantY - 1][enPassantX];
     }
     enemyPawnSquare.removeChild(enemyPawnSquare.firstChild);
   }
@@ -1507,7 +1670,7 @@ function movePiece(targetedSquare) {
   if (piece.dataset.piece.includes("pawn")) {
     lastPawnMove = startingSquare;
   }
-  
+
   // * Ajout de la pièce au carré cible
   if (colorPiece === "white") {
     listWhitePiece[piece.dataset.id] = targetedSquare;
@@ -1517,11 +1680,12 @@ function movePiece(targetedSquare) {
   // * Vide les carrés
   clearSquares();
 
-  if (piece.dataset.piece.includes("pawn") && (targetedSquare.dataset.y == 0 || targetedSquare.dataset.y == 7)) {
+  if (
+    piece.dataset.piece.includes("pawn") &&
+    (targetedSquare.dataset.y == 0 || targetedSquare.dataset.y == 7)
+  ) {
     pawnPromotion(targetedSquare);
   } else {
-
-    console.log(listBlackPiece);
     // * Mise à jour de la liste des mouvements
     updateListMove(listWhitePiece, "white");
     updateListMove(listBlackPiece, "black");
@@ -1533,7 +1697,6 @@ function movePiece(targetedSquare) {
 }
 
 function pawnPromotion(pawnSquare) {
-
   listWhitePieceMove = [];
   listBlackPieceMove = [];
   listWhiteCheckMove = [];
@@ -1544,7 +1707,7 @@ function pawnPromotion(pawnSquare) {
     if (pawn) {
       promotingPawn = pawn;
       let colorPawn = pawn.dataset.color;
-      if(colorPawn == "white") {
+      if (colorPawn == "white") {
         listPromotionPieces = document.getElementById("white_pieces");
       } else {
         listPromotionPieces = document.getElementById("black_pieces");
@@ -1559,7 +1722,7 @@ function promotion(type, color) {
   promotingPawn.dataset.piece = color + "_" + type;
 
   let listPromotionPieces;
-  if(color == "white") {
+  if (color == "white") {
     listPromotionPieces = document.getElementById("white_pieces");
   } else {
     listPromotionPieces = document.getElementById("black_pieces");
@@ -1590,16 +1753,22 @@ function clearSquares() {
   if (selectedSquare) {
     delete selectedSquare.dataset.selected;
     if (!selectedSquare.firstChild) {
-      let enPassantSquare = document.querySelectorAll("[data-enpassant = true]")[0];
+      let enPassantSquare = document.querySelectorAll(
+        "[data-enpassant = true]"
+      )[0];
       if (enPassantSquare) {
         delete enPassantSquare.dataset.enpassant;
       }
     }
   }
-  
-  
+
   castle = false;
-  let cornerSquare = [squares[0][0], squares[0][7], squares[7][0], squares[7][7]];
+  let cornerSquare = [
+    squares[0][0],
+    squares[0][7],
+    squares[7][0],
+    squares[7][7],
+  ];
   for (corner of cornerSquare) {
     if (!corner.dataset.clickevent) {
       corner.addEventListener("click", onClickSquareHandler);
@@ -1612,15 +1781,15 @@ function clearSquares() {
       corner.removeEventListener("click", onCastleClick);
 
       let rookCastleSquare = document.getElementsByClassName("castle_rook");
-      if (rookCastleSquare[0]){
+      if (rookCastleSquare[0]) {
         rookCastleSquare[0].classList.remove("castle_rook");
       }
       if (rookCastleSquare[1]) {
         rookCastleSquare[1].classList.remove("castle_rook");
       }
-      
+
       let kingCastleSquare = document.getElementsByClassName("castle_king");
-      if (kingCastleSquare[0]){
+      if (kingCastleSquare[0]) {
         kingCastleSquare[0].classList.remove("castle_king");
       }
       if (kingCastleSquare[1]) {
@@ -1628,7 +1797,6 @@ function clearSquares() {
       }
     }
   }
-
 }
 
 /**
@@ -1667,6 +1835,31 @@ function addPiece(targetedSquare, pieceName) {
 function changeColorTurn() {
   if (colorTurn === "white") {
     colorTurn = "black";
+
+    var aiToggle = document.getElementById("ai");
+    if (aiToggle.checked) {
+      if (!blackKingMate) {
+
+        var playingPiece;
+        var listMoveAvailable;
+        console.log("Test")
+        do {
+          playingPiece =
+            listBlackPiece[Math.floor(Math.random() * listBlackPiece.length)];
+          if (playingPiece != null && playingPiece != "") {
+            playingPiece.click();
+            listMoveAvailable = document.getElementsByClassName("move_possible");
+          }
+        } while (
+          ((listMoveAvailable == null || listMoveAvailable.length == 0) &&
+            !blackKingMate)
+        );
+  
+        var targetMoveSquare =
+          listMoveAvailable[Math.floor(Math.random() * listMoveAvailable.length)];
+        targetMoveSquare.click();
+      }
+    }
   } else {
     colorTurn = "white";
   }
@@ -1681,45 +1874,67 @@ function checkKingStatus() {
 
   checkingKingPiece = "";
   listInterceptSquare = [];
-  let kingPossibleMove;
-  let kingMate = true;
+  let whiteKingPossibleMove =
+    listWhitePieceMove[whiteKing.firstChild.dataset.id];
+  let blackKingPossibleMove =
+    listBlackPieceMove[blackKing.firstChild.dataset.id];
+  whiteKingMate = true;
+  blackKingMate = true;
   if (listBlackCheckMove.includes(whiteKing)) {
     isWhiteKingCheck = true;
     getCheckingPiece(whiteKing, listBlackPieceMove, listBlackPiece);
     getInterceptSquare(whiteKing, checkingKingPiece);
-    kingPossibleMove = listWhitePieceMove[whiteKing.firstChild.dataset.id];
+    whiteKingPossibleMove = listWhitePieceMove[whiteKing.firstChild.dataset.id];
     if (listInterceptSquare.length > 0) {
-      kingMate = false;
+      whiteKingMate = false;
     } else {
-      for (moveSquare of kingPossibleMove) {
+      for (moveSquare of whiteKingPossibleMove) {
         if (!listBlackCheckMove.includes(moveSquare)) {
-          kingMate = false;
+          whiteKingMate = false;
           break;
         }
       }
     }
   } else {
+    var nbWhitePiece = 0;
+    listWhitePiece.forEach((curWhitePiece) => {
+      if (curWhitePiece.firstChild) {
+        nbWhitePiece++;
+      }
+    });
+    if (nbWhitePiece != 1) {
+      whiteKingMate = false;
+    }
     isWhiteKingCheck = false;
   }
   if (listWhiteCheckMove.includes(blackKing)) {
     isBlackKingCheck = true;
     getCheckingPiece(blackKing, listWhitePieceMove, listWhitePiece);
     getInterceptSquare(blackKing, checkingKingPiece);
-    kingPossibleMove = listBlackPieceMove[blackKing.firstChild.dataset.id];
+    blackKingPossibleMove = listBlackPieceMove[blackKing.firstChild.dataset.id];
     if (listInterceptSquare.length > 0) {
-      kingMate = false;
+      blackKingMate = false;
     } else {
-      for (moveSquare of kingPossibleMove) {
+      for (moveSquare of blackKingPossibleMove) {
         if (!listWhiteCheckMove.includes(moveSquare)) {
-          kingMate = false;
+          blackKingMate = false;
           break;
         }
       }
     }
   } else {
+    var nbBlackPiece = 0;
+    listBlackPiece.forEach((curBlackPiece) => {
+      if (curBlackPiece.firstChild) {
+        nbBlackPiece++;
+      }
+    });
+    if (nbBlackPiece != 1) {
+      blackKingMate = false;
+    }
     isBlackKingCheck = false;
   }
-  
+
   let messageDiv = document.getElementById("message");
   let checkMessage = document.getElementById("checkMessage");
   if (checkMessage) {
@@ -1728,7 +1943,7 @@ function checkKingStatus() {
   if (isWhiteKingCheck) {
     checkMessage = document.createElement("h1");
     checkMessage.textContent = "White King Check";
-    if (kingMate) {
+    if (whiteKingMate) {
       checkMessage.textContent = "White King Checkmate";
     }
     checkMessage.id = "checkMessage";
@@ -1737,7 +1952,7 @@ function checkKingStatus() {
   if (isBlackKingCheck) {
     checkMessage = document.createElement("h2");
     checkMessage.textContent = "Black King Check";
-    if (kingMate) {
+    if (whiteKingMate) {
       checkMessage.textContent = "Black King Checkmate";
     }
     checkMessage.id = "checkMessage";
@@ -1750,9 +1965,6 @@ function getCheckingPiece(kingSquare, listOfMoveList, listPieces) {
     if (moveList) {
       if (moveList.includes(kingSquare)) {
         let idCheckingPiece = listOfMoveList.indexOf(moveList);
-        console.log(idCheckingPiece);
-        console.log(listPieces);
-        console.log(listPieces[idCheckingPiece]);
         checkingKingPiece = listPieces[idCheckingPiece];
       }
     }
@@ -1762,7 +1974,6 @@ function getCheckingPiece(kingSquare, listOfMoveList, listPieces) {
 function getInterceptSquare(kingSquare, checkingPiece) {
   let kingX = parseInt(kingSquare.dataset.x);
   let kingY = parseInt(kingSquare.dataset.y);
-  console.log(checkingPiece);
   let checkingPieceX = parseInt(checkingPiece.dataset.x);
   let checkingPieceY = parseInt(checkingPiece.dataset.y);
   let checkingPieceName = checkingPiece.firstChild.dataset.piece;
@@ -1864,7 +2075,7 @@ function checkCastleMove(rookSquare, kingSquare) {
               rookSquare.removeEventListener("click", onClickSquareHandler);
               delete rookSquare.dataset.clickevent;
 
-              rookSquare.addEventListener("click", onCastleClick);              
+              rookSquare.addEventListener("click", onCastleClick);
             }
           }
         }
@@ -1905,7 +2116,7 @@ function onMouseOverLeftRook(event) {
 function onMouseOutLeftRook(event) {
   let rook = event.currentTarget;
   let rookX = parseInt(rook.dataset.x);
-  let rookY = parseInt(rook.dataset.y);  
+  let rookY = parseInt(rook.dataset.y);
   squares[rookY][rookX + 3].classList.remove("castle_rook");
   squares[rookY][rookX + 2].classList.remove("castle_king");
 }
@@ -1921,7 +2132,7 @@ function onMouseOverRightRook(event) {
 function onMouseOutRightRook(event) {
   let rook = event.currentTarget;
   let rookX = parseInt(rook.dataset.x);
-  let rookY = parseInt(rook.dataset.y);  
+  let rookY = parseInt(rook.dataset.y);
   squares[rookY][rookX - 2].classList.remove("castle_rook");
   squares[rookY][rookX - 1].classList.remove("castle_king");
 }
@@ -1941,10 +2152,9 @@ function onCastleClick(event) {
   delete kingPiece.dataset.start;
 
   if (rookX == 0) {
-
     squares[rookY][rookX + 3].appendChild(rookSquare.firstChild);
     squares[kingY][kingX - 2].appendChild(kingSquare.firstChild);
-  
+
     let colorPiece = kingPiece.dataset.color;
     // * Ajout de la pièce au carré cible
     if (colorPiece === "white") {
@@ -1955,10 +2165,9 @@ function onCastleClick(event) {
       listBlackPiece[rookPiece.dataset.id] = squares[kingY][kingX - 2];
     }
   } else if (rookX == 7) {
-
     squares[rookY][rookX - 2].appendChild(rookSquare.firstChild);
     squares[kingY][kingX + 2].appendChild(kingSquare.firstChild);
-  
+
     let colorPiece = kingPiece.dataset.color;
     // * Ajout de la pièce au carré cible
     if (colorPiece === "white") {
@@ -1968,16 +2177,15 @@ function onCastleClick(event) {
       listBlackPiece[rookPiece.dataset.id] = squares[rookY][rookX - 2];
       listBlackPiece[rookPiece.dataset.id] = squares[kingY][kingX + 2];
     }
-    
   }
 
   // * Vide les carrés
   clearSquares();
-  // * Changement de tour
-  changeColorTurn();
   // * Mise à jour de la liste des mouvements
   updateListMove(listWhitePiece, "white");
   updateListMove(listBlackPiece, "black");
   // * Vérification des statuts des rois
   checkKingStatus();
+  // * Changement de tour
+  changeColorTurn();
 }
