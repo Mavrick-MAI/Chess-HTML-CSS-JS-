@@ -178,9 +178,11 @@ function createPieces(square) {
 
 function updateListMove(listSquare, color) {
   if (color === "white") {
+    listWhitePieceMove = [];
     listWhiteCheckMove = [];
     listBlackBlockingPiece = [];
   } else {
+    listBlackPieceMove = [];
     listBlackCheckMove = [];
     listWhiteBlockingPiece = [];
   }
@@ -1519,6 +1521,7 @@ function movePiece(targetedSquare) {
     pawnPromotion(targetedSquare);
   } else {
 
+    console.log(listBlackPiece);
     // * Mise à jour de la liste des mouvements
     updateListMove(listWhitePiece, "white");
     updateListMove(listBlackPiece, "black");
@@ -1747,6 +1750,9 @@ function getCheckingPiece(kingSquare, listOfMoveList, listPieces) {
     if (moveList) {
       if (moveList.includes(kingSquare)) {
         let idCheckingPiece = listOfMoveList.indexOf(moveList);
+        console.log(idCheckingPiece);
+        console.log(listPieces);
+        console.log(listPieces[idCheckingPiece]);
         checkingKingPiece = listPieces[idCheckingPiece];
       }
     }
@@ -1756,6 +1762,7 @@ function getCheckingPiece(kingSquare, listOfMoveList, listPieces) {
 function getInterceptSquare(kingSquare, checkingPiece) {
   let kingX = parseInt(kingSquare.dataset.x);
   let kingY = parseInt(kingSquare.dataset.y);
+  console.log(checkingPiece);
   let checkingPieceX = parseInt(checkingPiece.dataset.x);
   let checkingPieceY = parseInt(checkingPiece.dataset.y);
   let checkingPieceName = checkingPiece.firstChild.dataset.piece;
